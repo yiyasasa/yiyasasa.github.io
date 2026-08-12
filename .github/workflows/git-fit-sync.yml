@@ -62,7 +62,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: git-fit-db
-        path: ${{ steps.db-restore.outputs.db-dir }}
+        path: data/db
         retention-days: 1
         if-no-files-found: error
     - name: '[keep] Sync keep data'
