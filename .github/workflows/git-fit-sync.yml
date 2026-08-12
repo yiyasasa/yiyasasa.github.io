@@ -20,11 +20,17 @@ jobs:
       GIT_FIT_SYNC_TIME_BUDGET: ${{ vars.GIT_FIT_SYNC_TIME_BUDGET || '300' }}
 
     steps:
+    - name: '[db] Derive database paths'
+      id: db-paths
+      uses: git-fit-actions/db-store/paths@v1
+      with:
+        database-path: ${{ env.GIT_FIT_DATABASE_PATH }}
     - name: '[db] Restore database'
       id: db-restore
       uses: git-fit-actions/db-store/cache/restore@v1
       with:
-        database-path: ${{ env.GIT_FIT_DATABASE_PATH }}
+        db-dir: ${{ steps.db-paths.outputs.dir }}
+        db-name: ${{ steps.db-paths.outputs.name }}
     - name: '[keep] Restore from cache'
       uses: git-fit-actions/data-store/cache/restore@v1
       with:
@@ -56,7 +62,8 @@ jobs:
       id: db-save
       uses: git-fit-actions/db-store/cache/save@v1
       with:
-        database-path: ${{ env.GIT_FIT_DATABASE_PATH }}
+        db-dir: ${{ steps.db-paths.outputs.dir }}
+        db-name: ${{ steps.db-paths.outputs.name }}
     - name: '[db] Upload artifact'
       if: steps.db-save.outputs.changed == 'true'
       uses: actions/upload-artifact@v4
